@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dört Kapı — Kur'an Yolculuğu</title>
+<style>
+  :root{
+    --ink:#1c2b2a;--ink-soft:#2f4442;--paper:#e9e2d0;--paper-2:#ded4bd;--paper-3:#d3c8ad;
+    --jade:#3f6b5e;--jade-deep:#274a40;--seal:#9c3b32;--seal-soft:#b8564b;
+    --gold:#b8933f;--gold-glow:#d9b45a;--slate:#5a6b66;--line:rgba(28,43,42,.18);
+    --shadow:0 8px 30px rgba(28,43,42,.16);
+    --font-disp:"Georgia","Noto Serif",serif;
+    --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --arabic:"Traditional Arabic","Amiri","Noto Naskh Arabic",serif;
+    --c-blue:#2f6f9e;--c-orange:#d98a2b;--c-dorange:#c85a1f;--c-red:#a83a2c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+  body{background:radial-gradient(circle at 15% 10%, rgba(63,107,94,.06), transparent 40%),radial-gradient(circle at 85% 90%, rgba(156,59,50,.05), transparent 40%),var(--paper);min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 80px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 20px;border-bottom:2px solid var(--ink);margin-bottom:24px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .seal-mark{width:52px;height:52px;flex:0 0 52px;border:2px solid var(--seal);border-radius:8px;display:grid;place-items:center;color:var(--seal);font-family:var(--arabic);font-size:26px;transform:rotate(-2deg);background:rgba(156,59,50,.04)}
+  .brand h1{font-family:var(--font-disp);font-size:26px;letter-spacing:.5px;line-height:1}
+  .brand .sub{font-size:12px;color:var(--slate);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+  .modeswitch{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+  .modeswitch button{background:transparent;border:none;padding:9px 18px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);letter-spacing:.5px}
+  .modeswitch button.active{background:var(--ink);color:var(--paper)}
+  .panel{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
+  .panel h2{font-family:var(--font-disp);font-size:20px;margin-bottom:6px}
+  .panel p.hint{font-size:13px;color:var(--slate);margin-bottom:16px}
+  .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .pick{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-align:left;cursor:pointer;transition:.15s;font-family:var(--font-body)}
+  .pick:hover{border-color:var(--jade);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .pick .nm{font-weight:600;font-size:15px}
+  .pick .lv{font-size:11px;color:var(--slate);margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+  .student-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .student-head .who{font-family:var(--font-disp);font-size:22px}
+  .student-head .who small{display:block;font-family:var(--font-body);font-size:12px;color:var(--slate);letter-spacing:1px;margin-top:2px}
+  .backlink{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--slate)}
+  .map-wrap{background:linear-gradient(160deg,#e5dcc4,#d8ceb2);border:1px solid var(--line);border-radius:16px;padding:6px;box-shadow:var(--shadow);margin-bottom:26px;overflow:hidden}
+  .map-scroll{overflow-x:auto;overflow-y:hidden}
+  svg.map{display:block;min-width:860px;width:100%;height:auto}
+  .treasure-hint{font-size:11px;color:var(--slate);text-align:center;padding:8px 4px 4px;letter-spacing:.5px;font-style:italic}
+  .gates{display:grid;gap:16px}
+  .gate{background:var(--paper-2);border:1px solid var(--line);border-left:5px solid var(--slate);border-radius:12px;overflow:hidden;transition:.2s}
+  .gate.active{border-left-color:var(--jade);box-shadow:var(--shadow)}
+  .gate.done{border-left-color:var(--gold)}
+  .gate.locked{opacity:.55}
+  .gate-head{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer}
+  .gate-num{width:44px;height:44px;flex:0 0 44px;border-radius:50%;display:grid;place-items:center;font-family:var(--arabic);font-size:24px;background:var(--ink);color:var(--paper)}
+  .gate.done .gate-num{background:var(--gold);color:var(--ink)}
+  .gate.locked .gate-num{background:var(--slate)}
+  .gate-title{flex:1}
+  .gate-title .t{font-family:var(--font-disp);font-size:18px}
+  .gate-title .d{font-size:12px;color:var(--slate);margin-top:2px}
+  .gate-stat{font-size:12px;font-weight:600;color:var(--jade-deep);text-align:right;white-space:nowrap}
+  .gate.locked .gate-stat{color:var(--slate)}
+  .progress-mini{height:5px;background:rgba(28,43,42,.12);border-radius:99px;margin-top:6px;overflow:hidden;width:90px}
+  .progress-mini i{display:block;height:100%;background:var(--jade);border-radius:99px;transition:.4s}
+  .gate.done .progress-mini i{background:var(--gold)}
+  .gate-body{display:none;padding:0 18px 18px 76px}
+  .gate.open .gate-body{display:block}
+  .task{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-top:1px dashed var(--line)}
+  .task .chk{width:22px;height:22px;flex:0 0 22px;border:2px solid var(--jade);border-radius:6px;margin-top:1px;display:grid;place-items:center;font-size:14px;color:transparent}
+  .task.done .chk{background:var(--jade);color:var(--paper)}
+  .task .tx{flex:1;font-size:14px;line-height:1.5}
+  .task .tx .ar{font-family:var(--arabic);font-size:24px;letter-spacing:8px;direction:rtl;display:inline-block;margin-top:2px;vertical-align:middle}
+  .task.done .tx{color:var(--slate)}
+  .ar.blue{color:var(--c-blue)}.ar.yellow{color:#c9a21e}.ar.green{color:#4e8a3f}.ar.orange{color:var(--c-orange)}.ar.red{color:var(--c-red)}
+  .task .note{font-size:11px;color:var(--slate);margin-top:3px}
+  .mission-banner{margin-top:14px;background:linear-gradient(135deg,var(--jade-deep),var(--jade));color:var(--paper);border-radius:12px;padding:16px 18px;display:none;align-items:center;gap:14px}
+  .mission-banner.show{display:flex;animation:pop .4s ease}
+  @keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+  .mission-banner .mseal{font-family:var(--arabic);font-size:30px}
+  .mission-banner .mtx b{display:block;font-family:var(--font-disp);font-size:16px}
+  .mission-banner .mtx span{font-size:12px;opacity:.85}
+  .treasure-banner{margin-top:18px;background:linear-gradient(135deg,#6d5216,var(--gold));color:#2a2208;border-radius:14px;padding:18px 20px;display:none;align-items:center;gap:16px;box-shadow:0 10px 30px rgba(184,147,63,.4)}
+  .treasure-banner.show{display:flex;animation:pop .5s ease}
+  .treasure-banner .ts{font-size:34px}
+  .treasure-banner b{display:block;font-family:var(--font-disp);font-size:18px}
+  .treasure-banner span{font-size:12.5px}
+  .companions{margin-top:26px}
+  .companions h3{font-family:var(--font-disp);font-size:16px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .companions h3 .badge{font-size:11px;background:var(--jade);color:var(--paper);padding:2px 9px;border-radius:99px;letter-spacing:1px}
+  .companions .sub2{font-size:12px;color:var(--slate);margin:10px 0 8px}
+  .comp-row{display:flex;flex-wrap:wrap;gap:8px}
+  .comp{background:var(--paper-2);border:1px solid var(--line);border-radius:99px;padding:7px 14px;font-size:13px;display:flex;align-items:center;gap:8px}
+  .comp .dot{width:8px;height:8px;border-radius:50%;background:var(--jade)}
+  .comp.twin{background:rgba(184,147,63,.14);border-color:var(--gold)}
+  .comp.twin .dot{background:var(--gold)}
+  .comp .twintag{font-size:10px;background:var(--gold);color:#2a2208;padding:1px 8px;border-radius:99px;letter-spacing:.5px;font-weight:600}
+  .no-comp{font-size:13px;color:var(--slate);font-style:italic}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .toolbar select,.toolbar input{font-family:var(--font-body);padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font-size:13px}
+  .toolbar .grow{flex:1;min-width:160px}
+  table.board{width:100%;border-collapse:collapse;background:var(--paper-2);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:13px}
+  table.board th{background:var(--ink);color:var(--paper);text-align:left;padding:11px 12px;font-weight:600;letter-spacing:.5px;font-size:12px}
+  table.board td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:middle}
+  table.board tr:hover td{background:rgba(63,107,94,.05)}
+  .kapi-pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.3px}
+  .k0{background:#d9d2c0;color:var(--slate)}.k1{background:rgba(63,107,94,.18);color:var(--jade-deep)}
+  .k2{background:rgba(184,147,63,.22);color:#7a5f1e}.k3{background:rgba(156,59,50,.16);color:var(--seal)}
+  .k4{background:var(--gold);color:var(--ink)}
+  .bar{height:7px;width:120px;background:rgba(28,43,42,.12);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle}
+  .bar i{display:block;height:100%;background:var(--jade);border-radius:99px}
+  .managebtn{background:var(--jade-deep);color:var(--paper);border:none;border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer}
+  .delbtn{background:none;color:var(--seal);border:1px solid var(--seal-soft);border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer;margin-left:6px}
+  .delbtn:hover{background:rgba(156,59,50,.08)}
+  .abi-tag{font-size:11px;color:var(--slate)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .card{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card .n{font-family:var(--font-disp);font-size:30px;line-height:1}
+  .card .l{font-size:11px;color:var(--slate);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+  .modal-bg{position:fixed;inset:0;background:rgba(28,43,42,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--paper);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--paper)}
+  .modal-head h3{font-family:var(--font-disp);font-size:19px}
+  .modal-head .cls{background:none;border:none;font-size:22px;cursor:pointer;color:var(--slate);line-height:1}
+  .modal-body{padding:18px 20px}
+  .mk-gate{margin-bottom:18px}
+  .mk-gate>.gt{font-family:var(--font-disp);font-size:15px;color:var(--jade-deep);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .mk-task{display:flex;align-items:center;gap:11px;padding:8px 0;border-top:1px dashed var(--line)}
+  .mk-task label{flex:1;font-size:13px;cursor:pointer}
+  .mk-task .ar{font-family:var(--arabic);font-size:20px;direction:rtl}
+  .mk-task input{width:19px;height:19px;accent-color:var(--jade);cursor:pointer}
+  .assign-row{display:flex;gap:10px;align-items:center;margin-top:6px;padding:10px 0;border-top:1px solid var(--line)}
+  .assign-row label{font-size:12px;color:var(--slate)}
+  footer.ft{text-align:center;margin-top:40px;font-size:11px;color:var(--slate);letter-spacing:1px}
+  .empty{text-align:center;padding:40px;color:var(--slate);font-size:14px}
+  .loading{text-align:center;padding:60px;color:var(--slate)}
+  @media(max-width:640px){.brand h1{font-size:21px}.gate-body{padding-left:18px}table.board{font-size:12px}table.board th:nth-child(4),table.board td:nth-child(4){display:none}}
+</style>
+<!-- Firebase — Dört Kapı ortak defteri -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAcAxT4ZudjcSLmKwxLUrqa3OxAnohcJ9M",
+    authDomain: "dort-kapi.firebaseapp.com",
+    databaseURL: "https://dort-kapi-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dort-kapi",
+    storageBucket: "dort-kapi.firebasestorage.app",
+    messagingSenderId: "560951650215",
+    appId: "1:560951650215:web:0c7d2cac14ea9aa083b882"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const dortKapiDB = firebase.database().ref("dortkapi/v2");
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="seal-mark">ق</div>
+      <div><h1>Dört Kapı</h1><div class="sub">Kur'an Yolculuğu</div></div>
+    </div>
+    <div class="modeswitch">
+      <button id="mTalebe" class="active" onclick="setMode('talebe')">Talebe</button>
+      <button id="mAbi" onclick="setMode('abi')">Abi Paneli</button>
+    </div>
+  </header>
+  <div id="app"><div class="loading">Yükleniyor…</div></div>
+  <footer class="ft">DÖRT KAPI · yolculuk sabırla aşılır</footer>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head"><h3 id="mTitle">Talebe</h3><button class="cls" onclick="closeModal()">×</button></div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+const GATES=[
+  {id:"g1",ar:"١",title:"Birinci Kapı — Mahreç",desc:"Harflerin çıkış yeri ve doğru telaffuz",tasks:[
+    {id:"g1t1",tx:"Bu harfler:",ar:"ذ ز ظ",color:"blue"},
+    {id:"g1t2",tx:"Bu harfler:",ar:"س ص ق",color:"yellow"},
+    {id:"g1t3",tx:"Bu harf:",ar:"ط",color:"green"},
+    {id:"g1t4",tx:"Bu harfler:",ar:"ح ع",color:"orange"},
+    {id:"g1t5",tx:"Bu harf:",ar:"ض",color:"red"}
+  ]},
+  {id:"g2",ar:"٢",title:"İkinci Kapı — Tecvid I",desc:"Sessiz nun ve sakin mim halleri",tasks:[
+    {id:"g2t1",tx:"İzhar"},{id:"g2t2",tx:"İdgam Me'algunne"},{id:"g2t3",tx:"İdgam Bilâgunne"},
+    {id:"g2t4",tx:"İklab"},{id:"g2t5",tx:"İhfa"},{id:"g2t6",tx:"Sakin mim halleri"}
+  ]},
+  {id:"g3",ar:"٣",title:"Üçüncü Kapı — Tecvid II",desc:"İleri tecvid kuralları",tasks:[
+    {id:"g3t1",tx:"Kalkale"},{id:"g3t2",tx:"Zamir"},{id:"g3t3",tx:"Misleyn"},
+    {id:"g3t4",tx:"Mütecaniseyn"},{id:"g3t5",tx:"Hukmur Ra"}
+  ]},
+  {id:"g4",ar:"٤",title:"Dördüncü Kapı — Yüzleşme",desc:"Abiyle okuma sınavı",tasks:[
+    {id:"g4t1",tx:"Abiye bir sayfa okumak"},
+    {id:"g4t2",tx:"Abiye en fazla 5 hatalı bir sayfa okumak"},
+    {id:"g4t3",tx:"Abiye en fazla 1 hatalı sayfa okumak"}
+  ]}
+];
+const GATE_SHORT=["Başlangıç","Mahreç","Tecvid I","Tecvid II","Yüzleşme"];
+const SEED_ABIS=["Tarık abi","Orhan abi","Bahadır abi","Adil abi","Burak abi","Fatin abi","Numan abi"];
+const SEED_STUDENTS=[
+  "Mustafa","Berk","Talha","Hamza","İsa","Murat","Eymen","Kerem","Ahmet I","Erhan",
+  "Esat Mete","Furkan I","Muhammed (Mo)","Adil","Numan","Furkan II","Kutay","Hakan Efe","Cenk","Enes",
+  "Ahmet II","Yusuf","Ahmet (İkizler)","Muhammed (İkizler)","Mesut"
+];
+
+let STATE=null,mode="talebe",currentStudent=null;
+const ALL_TASK_IDS=GATES.flatMap(g=>g.tasks.map(t=>t.id));
+
+// normalize: Firebase boş obje/diziyi sildiği için okurken eksik alanları tamamla
+function normalizeState(){
+  if(!STATE) STATE={abis:[...SEED_ABIS],students:{}};
+  if(!STATE.abis) STATE.abis=[...SEED_ABIS];
+  if(!STATE.students) STATE.students={};
+  Object.keys(STATE.students).forEach(n=>{
+    if(!STATE.students[n]) STATE.students[n]={tasks:{},abi:""};
+    if(!STATE.students[n].tasks) STATE.students[n].tasks={};
+    if(STATE.students[n].abi===undefined) STATE.students[n].abi="";
+  });
+}
+async function saveState(){
+  try{ await dortKapiDB.set(STATE); }
+  catch(e){ console.error("Kaydedilemedi:",e); }
+}
+// tek seferlik yükleme yerine canlı dinleme: bir abi tik attığında diğer 6 telefonda anında güncellenir
+function startRealtimeSync(onReady){
+  let firstLoad=true;
+  dortKapiDB.on("value", async (snap)=>{
+    if(snap.exists()){
+      STATE=snap.val();
+      normalizeState();
+    } else {
+      STATE={abis:[...SEED_ABIS],students:{}};
+      SEED_STUDENTS.forEach(n=>{STATE.students[n]={tasks:{},abi:""};});
+      await saveState();
+      return;
+    }
+    if(firstLoad){ firstLoad=false; onReady(); }
+    else{ if(mode==="talebe") renderTalebe(); else renderAbi(); }
+  }, (err)=>{ console.error("Bağlantı hatası:",err); });
+}
+
+function gateComplete(st,g){return g.tasks.every(t=>st.tasks[t.id]);}
+function studentLevel(st){let l=0;for(const g of GATES){if(gateComplete(st,g))l++;else break;}return l;}
+function studentTotalDone(st){return ALL_TASK_IDS.filter(id=>st.tasks[id]).length;}
+function gateProg(st,g){return{done:g.tasks.filter(t=>st.tasks[t.id]).length,total:g.tasks.length};}
+function currentTaskSignature(st){
+  const lvl=studentLevel(st);if(lvl>=GATES.length)return"done";
+  const g=GATES[lvl];return g.id+"|"+g.tasks.filter(t=>st.tasks[t.id]).map(t=>t.id).join(",");
+}
+function currentTaskLabel(st){
+  const lvl=studentLevel(st);if(lvl>=GATES.length)return"yolu bitirmiş";
+  const g=GATES[lvl];const done=g.tasks.filter(t=>st.tasks[t.id]);
+  const gname=g.title.split("— ")[1];
+  if(done.length===0)return gname+" kapısına yeni başlamış";
+  const last=done[done.length-1];
+  return (last.ar?last.ar+" ":"")+last.tx.replace(":","");
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById("mTalebe").classList.toggle("active",m==="talebe");
+  document.getElementById("mAbi").classList.toggle("active",m==="abi");
+  if(m==="talebe"){currentStudent=null;renderTalebe();}else renderAbi();
+}
+
+function renderTalebe(){
+  if(currentStudent && !STATE.students[currentStudent]) currentStudent=null;
+  const app=document.getElementById("app");
+  if(!currentStudent){
+    const names=Object.keys(STATE.students);
+    app.innerHTML=`<div class="panel"><h2>Hoş geldin</h2>
+      <p class="hint">Yolculuğuna devam etmek için ismini seç.</p>
+      <div class="picker-grid">
+        ${names.map(n=>{const lvl=studentLevel(STATE.students[n]);
+          return `<button class="pick" onclick="openStudent('${esc(n)}')">
+            <div class="nm">${n}</div><div class="lv">${GATE_SHORT[lvl]||"Yolda"}</div></button>`;}).join("")}
+      </div></div>`;
+    return;
+  }
+  const st=STATE.students[currentStudent];
+  const myLevel=studentLevel(st);
+  const mySig=currentTaskSignature(st);
+  const kapiMates=Object.keys(STATE.students).filter(n=>n!==currentStudent&&studentLevel(STATE.students[n])===myLevel);
+  const twins=kapiMates.filter(n=>currentTaskSignature(STATE.students[n])===mySig);
+
+  app.innerHTML=`
+    <div class="student-head">
+      <div class="who">${currentStudent}
+        <small>${st.abi?("Rehber: "+st.abi):"Rehber henüz atanmadı"} · ${GATE_SHORT[myLevel]||"Yolda"}</small></div>
+      <button class="backlink" onclick="currentStudent=null;renderTalebe()">← İsim değiştir</button>
+    </div>
+    ${renderMap(myLevel)}
+    <div class="gates">${GATES.map((g,i)=>renderGate(st,g,i)).join("")}</div>
+    ${renderCompanions(myLevel,kapiMates,twins,st)}`;
+}
+
+function renderMap(myLevel){
+  const W=860,H=230,nodesX=[110,320,540,760],nodeY=120;
+  const gateNames=["Mahreç","Tecvid I","Tecvid II","Yüzleşme"];
+  const arNum=["١","٢","٣","٤"];
+  let path=`M ${nodesX[0]} ${nodeY}`;
+  for(let i=1;i<4;i++){const midX=(nodesX[i-1]+nodesX[i])/2;path+=` Q ${midX} ${i%2?60:180} ${nodesX[i]} ${nodeY}`;}
+  let markerX,markerY=nodeY;
+  if(myLevel<=0){markerX=nodesX[0]-46;}
+  else if(myLevel>=4){markerX=nodesX[3]+42;}
+  else{markerX=(nodesX[myLevel-1]+nodesX[myLevel])/2;markerY=myLevel%2?70:170;}
+  const gateSvg=nodesX.map((x,i)=>{
+    const passed=myLevel>i,atGate=myLevel===i;
+    const fill=passed?"#b8933f":atGate?"#3f6b5e":"#d3c8ad";
+    const stroke=passed?"#8a6d22":"#1c2b2a";
+    const txtCol=passed?"#3a2e08":atGate?"#e9e2d0":"#5a6b66";
+    return `<g>
+      <circle cx="${x}" cy="${nodeY}" r="30" fill="${fill}" stroke="${stroke}" stroke-width="2"/>
+      <text x="${x}" y="${nodeY+9}" text-anchor="middle" font-size="26" fill="${txtCol}" style="font-family:'Traditional Arabic','Amiri',serif">${arNum[i]}</text>
+      <text x="${x}" y="${nodeY+52}" text-anchor="middle" font-size="13" fill="#1c2b2a" style="font-family:Georgia,serif">${gateNames[i]}</text>
+      ${passed?`<text x="${x}" y="${nodeY-42}" text-anchor="middle" font-size="15" fill="#8a6d22">✦</text>`:""}
+    </g>`;
+  }).join("");
+  const treasureX=(nodesX[2]+nodesX[3])/2, tY=170;
+  const treasureGlow=myLevel>=3?`<g>
+      <circle cx="${treasureX}" cy="${tY}" r="15" fill="#d9b45a" opacity="0.9"/>
+      <circle cx="${treasureX}" cy="${tY}" r="15" fill="none" stroke="#b8933f" stroke-width="2">
+        <animate attributeName="r" values="15;24;15" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite"/></circle>
+      <text x="${treasureX}" y="${tY+6}" text-anchor="middle" font-size="17">✦</text>
+    </g>`:"";
+  return `<div class="map-wrap"><div class="map-scroll">
+    <svg class="map" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <path d="${path}" fill="none" stroke="#1c2b2a" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" opacity="0.5"/>
+      ${treasureGlow}${gateSvg}
+      <g>
+        <circle cx="${markerX}" cy="${markerY}" r="17" fill="#9c3b32" stroke="#e9e2d0" stroke-width="3"/>
+        <circle cx="${markerX}" cy="${markerY}" r="22" fill="none" stroke="#9c3b32" stroke-width="1.5" opacity="0.4">
+          <animate attributeName="r" values="20;28;20" dur="2.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.5;0;0.5" dur="2.2s" repeatCount="indefinite"/></circle>
+        <text x="${markerX}" y="${markerY-28}" text-anchor="middle" font-size="13" font-weight="bold" fill="#9c3b32" style="font-family:Georgia,serif">${currentStudent}</text>
+      </g>
+    </svg></div>
+    <div class="treasure-hint">Yolun sonunda seni bekleyen bir sır var…</div></div>`;
+}
+
+function renderGate(st,gate,idx){
+  const {done,total}=gateProg(st,gate);
+  const complete=done===total;
+  const prevDone=idx===0?true:gateComplete(st,GATES[idx-1]);
+  const locked=!prevDone&&!complete;
+  const isActive=prevDone&&!complete;
+  let cls="gate";
+  if(complete)cls+=" done";else if(isActive)cls+=" active";
+  if(locked)cls+=" locked";if(isActive)cls+=" open";
+  const pct=Math.round(done/total*100);
+  const isTreasureGate=idx===2;
+  return `<div class="${cls}" id="gate-${gate.id}">
+    <div class="gate-head" onclick="toggleGate('${gate.id}')">
+      <div class="gate-num">${locked?"🔒":gate.ar}</div>
+      <div class="gate-title"><div class="t">${gate.title}</div><div class="d">${gate.desc}</div></div>
+      <div class="gate-stat">${complete?"Mühür alındı ✓":locked?"Kilitli":done+" / "+total}
+        <div class="progress-mini"><i style="width:${pct}%"></i></div></div>
+    </div>
+    <div class="gate-body">
+      ${gate.tasks.map(t=>{const d=!!st.tasks[t.id];
+        return `<div class="task ${d?"done":""}"><div class="chk">${d?"✓":""}</div>
+          <div class="tx">${t.tx}${t.ar?` <span class="ar ${t.color||""}">${t.ar}</span>`:""}${t.note?`<div class="note">${t.note}</div>`:""}</div></div>`;
+      }).join("")}
+      <div class="mission-banner ${complete?"show":""}">
+        <div class="mseal">✦</div>
+        <div class="mtx"><b>Kapı aşıldı!</b><span>${gate.title.split("— ")[1]} tamamlandı. ${idx<3?"Sıradaki kapı açıldı.":"Yolun sonuna ulaştın."}</span></div>
+      </div>
+      ${isTreasureGate?`<div class="treasure-banner ${complete?"show":""}">
+        <div class="ts">✦</div>
+        <div><b>Gizli hazine açıldı!</b><span>Üçüncü kapıyı aşan yolcuya, uzak diyarların saklı bir emaneti ulaştı. Rehberin sana ulaştıracak.</span></div>
+      </div>`:""}
+    </div>
+  </div>`;
+}
+function toggleGate(id){const el=document.getElementById("gate-"+id);if(el.classList.contains("locked"))return;el.classList.toggle("open");}
+function openStudent(n){currentStudent=n;renderTalebe();}
+
+function renderCompanions(myLevel,kapiMates,twins,st){
+  const label=GATE_SHORT[myLevel]||"Yolda";
+  const twinLabel=currentTaskLabel(st);
+  let twinBlock="";
+  if(twins.length){
+    twinBlock=`<div class="sub2">Seninle aynı adımda olanlar — <strong>${twinLabel}</strong>:</div>
+      <div class="comp-row">
+        ${twins.map(n=>`<span class="comp twin"><span class="dot"></span>${n}<span class="twintag">birlikte ✦</span></span>`).join("")}
+      </div>`;
+  }
+  // aynı kapıdaki diğerleri = twin olmayan kapı yoldaşları
+  const others=kapiMates.filter(n=>!twins.includes(n));
+  let othersBlock="";
+  if(others.length){
+    othersBlock=`<div class="sub2">Aynı kapıdaki diğer yoldaşların:</div>
+      <div class="comp-row">
+        ${others.map(n=>`<span class="comp"><span class="dot"></span>${n}</span>`).join("")}
+      </div>`;
+  }
+  // hiç kapı yoldaşı yoksa (ne twin ne other) bölümü hiç gösterme
+  // yeni başlayan (hiç tik atmamış) talebeye yoldaş gösterme — herkes aynı yerdeyken anlamsız
+  if(studentTotalDone(st)===0) return "";
+  // hiç kapı yoldaşı yoksa da gösterme
+  if(kapiMates.length===0) return "";
+  return `<div class="companions">
+    <h3>Yol yoldaşların <span class="badge">${label}</span></h3>
+    ${twinBlock}
+    ${othersBlock}
+  </div>`;
+}
+
+let filterKapi="all",filterAbi="all",searchTx="";
+function renderAbi(){
+  const app=document.getElementById("app");
+  const names=Object.keys(STATE.students);
+  const levels=[0,0,0,0,0];
+  names.forEach(n=>levels[studentLevel(STATE.students[n])]++);
+  let rows=names.map(n=>({n,st:STATE.students[n],lvl:studentLevel(STATE.students[n]),done:studentTotalDone(STATE.students[n])}));
+  if(filterKapi!=="all")rows=rows.filter(r=>r.lvl===+filterKapi);
+  if(filterAbi!=="all")rows=rows.filter(r=>r.st.abi===filterAbi);
+  if(searchTx)rows=rows.filter(r=>r.n.toLowerCase().includes(searchTx.toLowerCase()));
+  rows.sort((a,b)=>b.lvl-a.lvl||b.done-a.done||a.n.localeCompare(b.n,"tr"));
+  app.innerHTML=`
+    <div class="cards">
+      <div class="card"><div class="n">${names.length}</div><div class="l">Talebe</div></div>
+      <div class="card"><div class="n">${STATE.abis.length}</div><div class="l">Abi</div></div>
+      <div class="card"><div class="n">${levels[1]+levels[2]+levels[3]}</div><div class="l">Yolda</div></div>
+      <div class="card"><div class="n">${levels[3]+levels[4]}</div><div class="l">Hazineye ulaşan</div></div>
+    </div>
+    <div class="toolbar">
+      <input class="grow" id="srch" placeholder="Talebe ara…" value="${searchTx}" oninput="searchTx=this.value;renderAbi();focusSearch()">
+      <select onchange="filterKapi=this.value;renderAbi()">
+        <option value="all">Tüm kapılar</option>
+        ${GATE_SHORT.map((l,i)=>`<option value="${i}" ${filterKapi==i?"selected":""}>${l}</option>`).join("")}
+      </select>
+      <select onchange="filterAbi=this.value;renderAbi()">
+        <option value="all">Tüm abiler</option>
+        <option value="" ${filterAbi===""?"selected":""}>Atanmamış</option>
+        ${STATE.abis.map(a=>`<option value="${a}" ${filterAbi===a?"selected":""}>${a}</option>`).join("")}
+      </select>
+      <button class="managebtn" onclick="addStudent()">+ Yeni Talebe</button>
+    </div>
+    <table class="board">
+      <thead><tr><th>Talebe</th><th>Konum</th><th>İlerleme</th><th>Rehber abi</th><th></th></tr></thead>
+      <tbody>
+        ${rows.length?rows.map(r=>{const pct=Math.round(r.done/ALL_TASK_IDS.length*100);
+          return `<tr><td><strong>${r.n}</strong></td>
+            <td><span class="kapi-pill k${r.lvl}">${GATE_SHORT[r.lvl]||"Yolda"}</span></td>
+            <td><span class="bar"><i style="width:${pct}%"></i></span> <span class="abi-tag">${r.done}/${ALL_TASK_IDS.length}</span></td>
+            <td>${r.st.abi||`<span class="abi-tag">—</span>`}</td>
+            <td><button class="managebtn" onclick="manage('${esc(r.n)}')">İşle</button><button class="delbtn" onclick="removeStudent('${esc(r.n)}')">Sil</button></td></tr>`;
+        }).join(""):`<tr><td colspan="5"><div class="empty">Eşleşen talebe yok.</div></td></tr>`}
+      </tbody>
+    </table>`;
+}
+function focusSearch(){const s=document.getElementById("srch");if(s){s.focus();s.setSelectionRange(s.value.length,s.value.length);}}
+
+let manageName=null;
+function manage(n){
+  manageName=n;const st=STATE.students[n];
+  document.getElementById("mTitle").textContent=n;
+  document.getElementById("mBody").innerHTML=`
+    <div class="assign-row"><label>Rehber abi:</label>
+      <select onchange="assignAbi(this.value)" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--paper)">
+        <option value="">— atanmadı —</option>
+        ${STATE.abis.map(a=>`<option value="${a}" ${st.abi===a?"selected":""}>${a}</option>`).join("")}
+      </select></div>
+    ${GATES.map(g=>`<div class="mk-gate"><div class="gt">${g.ar} ${g.title.split("— ")[1]}</div>
+      ${g.tasks.map(t=>{const d=!!st.tasks[t.id];
+        return `<div class="mk-task"><input type="checkbox" id="chk-${t.id}" ${d?"checked":""} onchange="toggleTask('${t.id}',this.checked)">
+          <label for="chk-${t.id}">${t.tx} ${t.ar?`<span class="ar">${t.ar}</span>`:""}</label></div>`;}).join("")}
+    </div>`).join("")}`;
+  document.getElementById("modalBg").classList.add("show");
+}
+function closeModal(){document.getElementById("modalBg").classList.remove("show");renderAbi();}
+async function toggleTask(id,val){STATE.students[manageName].tasks[id]=val;await saveState();}
+async function assignAbi(a){STATE.students[manageName].abi=a;await saveState();}
+async function addStudent(){
+  const name=prompt("Yeni talebenin adını yaz:");
+  if(!name) return;
+  const trimmed=name.trim();
+  if(!trimmed) return;
+  if(STATE.students[trimmed]){ alert("Bu isimde bir talebe zaten var. Farklı bir isim dene (örn. Ahmet III)."); return; }
+  STATE.students[trimmed]={tasks:{},abi:""};
+  await saveState();
+  renderAbi();
+}
+async function removeStudent(name){
+  if(!confirm(name+" adlı talebeyi silmek istediğine emin misin? Bu işlem geri alınamaz.")) return;
+  delete STATE.students[name];
+  await saveState();
+  renderAbi();
+}
+document.getElementById("modalBg").addEventListener("click",e=>{if(e.target.id==="modalBg")closeModal();});
+function esc(s){return s.replace(/'/g,"\\'");}
+(function init(){ startRealtimeSync(()=>{ renderTalebe(); }); })();
+</script>
+</body>
+</html>
